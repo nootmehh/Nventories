@@ -9,11 +9,11 @@ import Dropdown from '@/components/ui/dropdown';
 
 interface AddAccountModalProps {
   isOpen: boolean;
-  onClose: () => void;
-  onSave: (data: any) => Promise<void>; // Prop untuk callback saat form disimpan
+  onCloseAction: () => void;
+  onSaveAction: (data: any) => Promise<void>; // Prop untuk callback saat form disimpan
 }
 
-export default function addAccountModal({ isOpen, onClose, onSave }: AddAccountModalProps) {
+export default function AddAccountModal({ isOpen, onCloseAction, onSaveAction }: AddAccountModalProps) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
@@ -39,15 +39,15 @@ export default function addAccountModal({ isOpen, onClose, onSave }: AddAccountM
     }
 
     try {
-      // Panggil prop onSave dari parent component
-      await onSave({ username, email, role, password });
+  // Panggil prop onSaveAction dari parent component
+  await onSaveAction({ username, email, role, password });
       
       // Reset form setelah berhasil
       setUsername('');
       setEmail('');
       setRole('');
       setPassword('');
-      onClose(); // Tutup modal
+  onCloseAction(); // Tutup modal
     } catch (error) {
       // Error akan ditangani di parent component
     } finally {
@@ -65,7 +65,7 @@ export default function addAccountModal({ isOpen, onClose, onSave }: AddAccountM
             Please fill out the information to continue.
           </p>
         </div>
-        <CustomButton variant="ghost" size="smallIcon" onClick={onClose} Icon={X} />
+  <CustomButton variant="ghost" size="smallIcon" onClick={onCloseAction} Icon={X} />
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -106,7 +106,7 @@ export default function addAccountModal({ isOpen, onClose, onSave }: AddAccountM
           />
 
           <div className="flex justify-end gap-3 mt-6">
-            <CustomButton type="button" variant="ghost" onClick={onClose}>
+            <CustomButton type="button" variant="ghost" onClick={onCloseAction}>
               Cancel
             </CustomButton>
             <CustomButton type="submit" variant="primary" disabled={loading}>

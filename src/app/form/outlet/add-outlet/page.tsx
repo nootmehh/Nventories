@@ -128,8 +128,8 @@ export default function AddOutletPage() {
             {showAddAccountModal && (
                 <AddAccountModal 
                     isOpen={showAddAccountModal}
-                    onClose={() => setShowAddAccountModal(false)}
-                    onSave={handleSaveAccount}
+                    onCloseAction={() => setShowAddAccountModal(false)}
+                    onSaveAction={handleSaveAccount}
                 />
             )}
 

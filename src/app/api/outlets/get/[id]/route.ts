@@ -3,7 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@vercel/postgres';
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const client = createClient({
     connectionString: process.env.POSTGRES_URL,
   });
@@ -11,9 +12,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
   await client.connect();
 
   try {
-    const id = context.params.id;
-
-    if (!id) {
+  if (!id) {
       return NextResponse.json({ message: 'Outlet ID is required' }, { status: 400 });
     }
 

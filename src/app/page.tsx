@@ -106,7 +106,7 @@ export default function LoginPage() {
                     </CustomButton>
                   </form>
                   <div className="w-full inline-flex justify-center items-center gap-2">
-                    <p className="text-sm text-grey-desc">Doesn't have an account?</p>
+                    <p className="text-sm text-grey-desc">Don&apos;t have an account?</p>
                     <Link href="/signup" className="text-sm text-primary-orange font-medium hover:underline">
                       Sign up here!
                     </Link>

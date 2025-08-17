@@ -23,8 +23,7 @@ export async function POST(request: NextRequest) {
     for (const f of files) {
       // f is a File from the web API
       // convert to buffer
-      // @ts-ignore
-      const file: any = f;
+  const file: any = f;
       const name = file.name || `upload-${Date.now()}`;
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);

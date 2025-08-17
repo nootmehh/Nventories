@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@vercel/postgres';
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const client = createClient({ connectionString: process.env.POSTGRES_URL });
   await client.connect();
   try {
-    // Next.js may provide params as a thenable — await it before using
-    const resolvedParams: any = await params;
-    const id = resolvedParams?.id;
+    const { id } = await params;
     if (!id) return NextResponse.json({ message: 'Missing id' }, { status: 400 });
 
     await client.query('BEGIN');

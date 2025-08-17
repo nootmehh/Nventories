@@ -2,14 +2,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@vercel/postgres';
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: userIdToDelete } = await params;
   const client = createClient({
     connectionString: process.env.POSTGRES_URL,
   });
 
   try {
-    const userIdToDelete = params.id;
-
     if (!userIdToDelete) {
       return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
     }

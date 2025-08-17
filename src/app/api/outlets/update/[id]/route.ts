@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import { createClient } from '@vercel/postgres';
 
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   if (!id) {
     return NextResponse.json({ message: 'Outlet ID is required' }, { status: 400 });
   }

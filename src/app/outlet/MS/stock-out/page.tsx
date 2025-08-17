@@ -7,7 +7,7 @@ import { CustomButton } from "@/components/ui/customButton";
 import { CustomInput } from "@/components/ui/input";
 import Navbar from "@/components/navbar";
 import EmptyStateTable from "@/components/EmptyStateTable";
-import Pagination from "@/components/pagination";
+import Pagination from "@/components/Pagination";
 import "@/app/globals.css";
 
 import {
