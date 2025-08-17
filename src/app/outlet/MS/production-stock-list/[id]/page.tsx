@@ -8,7 +8,6 @@ import "@/app/globals.css";
 
 import {
   Plus,
-  ChevronDown,
   Pencil,
   Search,
   Download
@@ -16,6 +15,7 @@ import {
 import Dropdown from "@/components/ui/dropdown";
 import { useUser } from "@/context/UserContext";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ProductionStockPage() {
     
@@ -48,14 +48,7 @@ export default function ProductionStockPage() {
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <CustomButton
-                                variant="outline"
-                                size="lg"
-                                iconPlacement="right"
-                                Icon={Download}
-                                >
-                                Export production stock
-                                </CustomButton>
+                            <Link href={`/form/outlet/MS/add-production-stock/${outletId}`}>
                             <CustomButton
                             variant="primary"
                             size="lg"
@@ -64,6 +57,7 @@ export default function ProductionStockPage() {
                             >
                             Add production stock      
                             </CustomButton>
+                            </Link>
                         </div> 
                     </div>
                     {/* Line */}

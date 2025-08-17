@@ -3,6 +3,7 @@ import { createClient } from '@vercel/postgres';
 
 export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
     const {
       outletId,
       materialName,
@@ -11,7 +12,16 @@ export async function POST(request: NextRequest) {
       pricePerUnit,
       minStockReminder,
       openingStock
-    } = await request.json();
+    } = body;
+
+    // allow optional stock fields; if caller provides null explicitly we keep null,
+    // otherwise default to 0 when not provided
+    const stockIn = Object.prototype.hasOwnProperty.call(body, 'stock_in')
+      ? body.stock_in
+      : 0;
+    const stockInProduction = Object.prototype.hasOwnProperty.call(body, 'stock_in_production')
+      ? body.stock_in_production
+      : 0;
 
     if (
       !outletId ||
@@ -34,11 +44,13 @@ export async function POST(request: NextRequest) {
     const result = await client.sql`
       INSERT INTO raw_material (
         outlet_id, material_name, sku, unit_name,
-        price_per_unit, min_stock_reminder, opening_stock, remaining_stock
+        price_per_unit, min_stock_reminder, opening_stock, remaining_stock,
+        stock_in, stock_in_production
       )
       VALUES (
         ${outletId}, ${materialName}, ${sku}, ${unitName},
-        ${pricePerUnit}, ${minStockReminder}, ${openingStock}, ${openingStock}
+        ${pricePerUnit}, ${minStockReminder}, ${openingStock}, ${openingStock},
+        ${stockIn}, ${stockInProduction}
       )
       RETURNING id
     `;

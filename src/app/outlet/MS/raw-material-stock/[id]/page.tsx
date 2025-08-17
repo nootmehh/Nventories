@@ -121,9 +121,9 @@ export default function RawMaterialStockPage() {
                         <div className="w-full">SKU</div>
                         <div className="w-full">Opening stock</div>
                         <div className="w-full">Stock in</div>
-                        <div className="w-full">Stock out</div>
+                        <div className="w-full">Stock in Production</div>
                         <div className="w-full">Remaining Stock</div>
-                        <div className="w-full">Unit</div>
+                        <div className="min-w-15">Unit</div>
                         <div className="w-full">Price per unit (Rp)</div>
                         <div className="collapse">
                             <CustomButton variant="ghost" size="smallIcon" Icon={Pencil} />
@@ -142,7 +142,7 @@ export default function RawMaterialStockPage() {
                                 <div className="w-full">{item.stock_in || 0}</div>
                                 <div className="w-full">{item.stock_out || 0}</div>
                                 <div className="w-full">{item.remaining_stock}</div>
-                                <div className="w-full">{item.unit_name}</div>
+                                <div className="min-w-15">{item.unit_name}</div>
                                 <div className="w-full">
                                     {Number(item.price_per_unit).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                 </div>

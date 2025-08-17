@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 // Tidak perlu import "@/app/globals.css"; di sini
 
 const inputVariants = cva(
-  "w-auto px-4 py-2 rounded-lg border text-sm text-primary-blue font-medium shadow-sm focus:outline-none",
+  "w-full px-4 py-2 rounded-lg border text-sm text-primary-blue font-medium shadow-sm focus:outline-none",
   {
     variants: {
       intent: {

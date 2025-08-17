@@ -101,15 +101,6 @@ export default function POrderPage() {
 
     const currentOutlet = allOutlets?.find(outlet => String(outlet.id) === outletId);
     
-    if (user?.role === 'Employee') {
-        return (
-            <div className="w-full text-center p-8">
-                <h1 className="text-2xl font-bold text-red-500">Access Denied</h1>
-                <p className="text-gray-600 mt-2">You do not have permission to view this page.</p>
-            </div>
-        );
-    }
-    
     return (
         <div className='w-full'>
             <div className="w-full px-8 py-6 bg-white-1 rounded-2xl inline-flex flex-col justify-between items-start shadow-sm">
@@ -140,7 +131,7 @@ export default function POrderPage() {
                     <div className="self-stretch h-0 outline-[1.50px] outline-offset-[-0.75px] outline-white-3"></div>
                     <div className="self-stretch w-full flex justify-between items-center">
                         <CustomInput
-                            placeholder="Search purchase invoice"
+                            placeholder="Search purchase order"
                             className="w-64 gap-3"
                             iconLeft={<Search />}
                             value={searchQuery}

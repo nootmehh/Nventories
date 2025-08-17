@@ -91,14 +91,6 @@ export default function ShowPurchaseOrderPage() {
         fetchPurchaseOrder();
     }, [orderId, router]);
 
-    const handleRemoveProduct = (productId: number) => {
-        // Logika hapus produk di halaman show tidak ada
-    };
-
-    if (initialLoading) {
-        return <div>Loading purchase order...</div>;
-    }
-
     function calculateSubtotal(): number {
   if (!products.length) return 0;
   return products.reduce(

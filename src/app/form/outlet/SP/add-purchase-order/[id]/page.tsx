@@ -244,8 +244,8 @@ export default function AddPurchaseOrderPage() {
                     </div>
                     <div className='inline-flex w-full gap-3'>
                         <DateInput
-                            label="Date in"
-                            placeholder="Choose date in"
+                            label="Date order"
+                            placeholder="Choose date order"
                             value={orderDate}
                             onChange={setOrderDate}
                         />
