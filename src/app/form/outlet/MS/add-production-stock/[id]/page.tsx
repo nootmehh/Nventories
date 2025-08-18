@@ -8,6 +8,7 @@ import { CustomInput } from "@/components/ui/input";
 import "@/app/globals.css";
 
 import { useUser } from '@/context/UserContext';
+import CustomRadioButton from '@/components/ui/customRadioButton';
 import Dropdown from '@/components/ui/dropdown';
 
 
@@ -23,7 +24,9 @@ export default function AddProductionStockPage() {
     const [pricePerUnit, setPricePerUnit] = useState('');
     const [minStockReminder, setMinStockReminder] = useState('');
     const [openingStock, setOpeningStock] = useState('');
+    const [packageSize, setPackageSize] = useState('');
     const [loading, setLoading] = useState(false);
+    const [productionType, setProductionType] = useState<'new' | 'existed'>('new');
 
     const formatRupiah = (value: string) => {
     const cleaned = value.replace(/[^0-9]/g, '');
@@ -31,12 +34,7 @@ export default function AddProductionStockPage() {
     return formatted;
   };
 
-  const handleRupiah = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPricePerUnit(formatRupiah(value));
-  };
-
-    const UnitOptions = [
+  const UnitOptions = [
   // Berat
   { label: 'Kg', value: 'Kg' },
   { label: 'Gram', value: 'Gram' },
@@ -80,6 +78,11 @@ export default function AddProductionStockPage() {
   { label: 'Pair', value: 'Pair' },
 ];
 
+  const handleRupiah = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPricePerUnit(formatRupiah(value));
+  };
+
  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -90,11 +93,19 @@ export default function AddProductionStockPage() {
         return;
     }
 
+    if (productionType === 'new' && !packageSize) {
+        alert('Please provide the package size for new production items.');
+        setLoading(false);
+        return;
+    }
+
     try {
         const payload = {
             outletId,
             materialName,
             sku,
+            productionType,
+            packageSize: productionType === 'new' ? Number(packageSize) || 0 : undefined,
             unitName,
             pricePerUnit: Number(pricePerUnit.replace(/[^0-9]/g, '')) || 0, // Default 0 jika input kosong
             minStockReminder: Number(minStockReminder) || 0, // Default 0 jika input kosong
@@ -127,81 +138,82 @@ export default function AddProductionStockPage() {
             <div className="w-6xl px-8 py-6 bg-white-1 rounded-2xl flex flex-col justify-center shadow-sm ">
                 <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>
                     <div className="w-full flex flex-col gap-1">
-                        <h1 className="font-semibold text-base text-primary-blue">Raw Material Information</h1>
-                        <p className="text-sm font-medium text-grey-desc">Please fill in the information below to add a raw material.</p>
+                        <h1 className="font-semibold text-base text-primary-blue">Add Production Data</h1>
+                        <p className="text-sm font-medium text-grey-desc">Please fill in the information below to add a new production list.</p>
                     </div>
+
                     <div className="self-stretch h-0 outline-[1.50px] outline-offset-[-0.75px] outline-white-3"></div>
 
-                    <div className='flex flex-col w-full gap-4'>
-                        <div className='inline-flex w-full gap-3'>
-                            <CustomInput
-                                type="text"
-                                label="Raw Material Name"
-                                placeholder="Ex: Sugar, Rice, etc."
-                                className="w-full"
-                                value={materialName}
-                                onChange={(e) => setMaterialName(e.target.value)}
-                                required
+                    <div className='w-full inline-flex gap-3'>
+                        <CustomRadioButton
+                            name="productionType"
+                            value="new"
+                            checked={productionType === 'new'}
+                            onChange={(value) => setProductionType(value as 'new' | 'existed')}
+                            title="Create new finished goods list"
+                            description="Create a new list for finished goods."
+                        />
+                        <CustomRadioButton
+                            name="productionType"
+                            value="existed"
+                            checked={productionType === 'existed'}
+                            onChange={(value) => setProductionType(value as 'new' | 'existed')}
+                            title="Use existed finished goods"
+                            description="Choose from existed goods, on production"
+                        />
+                    </div>
+                    
+
+            {productionType === 'new' && (
+                        <div className="w-full flex-col flex gap-6">
+                            <div className='inline-flex w-full gap-3'>
+                                <CustomInput
+                                label='Finished goods name'
+                                placeholder="Ex: Special fried rice"
+                                value={''}
+                                onChange={(e) => ('')}
                             />
-                            <CustomInput
-                                type="text"
-                                label="SKU"
-                                placeholder="Ex: SKU-001"
-                                className="w-full"
+                                <CustomInput
+                                label='SKU'
+                                placeholder="Ex: SKU-123"
                                 value={sku}
                                 onChange={(e) => setSku(e.target.value)}
-                                required
-                                />
-                        </div>
-                    </div>
-                    <div className='flex flex-col w-full gap-x-0'>
-                        <div className="bg-white-2 px-3 py-4 self-stretch w-full outline-1 outline-white-3 inline-flex  justif-start gap-6 text-grey-desc text-sm font-semibold uppercase items-center">
-                            <div className="w-full">Unit Name</div>
-                            <div className="w-full">Price per unit (Rp)</div>
-                            <div className="w-full">Minimum Stock Reminder</div>
-                        </div>
-                        <div className="px-3 py-4 self-stretch w-full border-b border-white-3 inline-flex items-center justify-start gap-6 text-grey-2">
-                            <div className="w-full">
-                                <Dropdown
-                                className="w-full font-medium"
-                                placeholder="Choose unit"
-                                options={UnitOptions}
-                                value={unitName}
-                                onChange={setUnitName}
                             />
                             </div>
-                            <div className="w-full">
-                                <CustomInput
-                                className='w-full'
-                                type="text"
-                                inputMode='numeric'
-                                placeholder="Ex: 1.000"
-                                value={pricePerUnit}
-                                onChange={handleRupiah}
-                                required
+                            <div className='inline-flex w-full justify-start gap-3'>
+                            <Dropdown
+                            label='Unit name'
+                            className="w-full"
+                            placeholder="Choose unit"
+                            options={UnitOptions}
+                            value={unitName}
+                            onChange={setUnitName}
                             />
-                            </div>
-                            <div className="w-full">
-                                <CustomInput
-                                className='w-full'
-                                type="number"
-                                placeholder="Ex: 10"
-                                value={minStockReminder}
-                                onChange={(e) => setMinStockReminder(e.target.value)}
-                                required
-                            />
-                            </div>
-                            
+
+                        <CustomInput
+                            label='Minimum stock reminder'
+                            className='w-64'
+                            type="number"
+                            placeholder="Ex: 10"
+                            value={minStockReminder}
+                            onChange={(e) => setMinStockReminder(e.target.value)}
+                            required
+                        />
+                            </div>    
                         </div>
-                    </div>           
+                    )}
+                    <CustomInput
+                        placeholder="Material Name"
+                        value={materialName}
+                        onChange={(e) => setMaterialName(e.target.value)}
+                    />
                     <div className="flex justify-end mt-8">
                         <CustomButton
                             type="submit"
                             variant="primary"
                             size="lg"
                             disabled={loading}
-                        >
-                            {loading ? 'Saving...' : 'Save Raw Material'}
+                        >{loading ? 'Saving...' : productionType === 'new' ? 'Save New Production' : 'Save Stock Production'}
                         </CustomButton>
                     </div>
                 </form>
