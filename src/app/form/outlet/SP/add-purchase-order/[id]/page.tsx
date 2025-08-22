@@ -193,14 +193,14 @@ export default function AddPurchaseOrderPage() {
     }
     return (
         <div className="w-full self-stretch pt-18 pb-8 bg-white-2 flex flex-col gap-8 justify-center items-center">            
-            {showProductModal && (
-              <ProductModal
-                isOpen={showProductModal}
-                onClose={() => setShowProductModal(false)}
-                onSave={handleSaveProducts}
-                outletId={outletId}
-              />
-            )}
+                        {showProductModal && (
+                            <ProductModal
+                                isOpen={showProductModal}
+                                onCloseAction={() => setShowProductModal(false)}
+                                onSaveAction={handleSaveProducts}
+                                outletId={outletId}
+                            />
+                        )}
 
             <div className="w-6xl px-8 py-6 bg-white-1 rounded-2xl flex flex-col justify-center shadow-sm ">
                 <form className="w-full flex flex-col gap-6" onSubmit={handleSubmit}>

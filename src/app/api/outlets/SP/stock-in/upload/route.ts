@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
   const form = await request.formData();
   const files = form.getAll('files');
   const invoiceId = form.get('invoiceId') ? String(form.get('invoiceId')) : null;
+  // optional folder override (e.g. 'stock_out')
+  const folderOverride = form.get('folder') ? String(form.get('folder')) : null;
     if (!files || files.length === 0) return NextResponse.json({ urls: [] });
 
   const supabase = createSupabaseClient(supabaseUrl, serviceKey);
@@ -27,7 +29,14 @@ export async function POST(request: NextRequest) {
       const name = file.name || `upload-${Date.now()}`;
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-  const folder = invoiceId ? `stock_in/${invoiceId}` : `stock_in`;
+  // determine target folder inside bucket
+  let folder = 'stock_in';
+  if (folderOverride) {
+    // allow direct folder like 'stock_out' or 'other/path'
+    folder = folderOverride.replace(/^\/+|\/+$/g, '');
+  } else if (invoiceId) {
+    folder = `stock_in/${invoiceId}`;
+  }
   const key = `${folder}/${Date.now()}_${name.replace(/[^a-zA-Z0-9_.-]/g, '_')}`;
 
       const { error: uploadErr } = await supabase.storage.from(bucket).upload(key, buffer, {

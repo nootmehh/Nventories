@@ -1,33 +1,27 @@
 'use client';
 
-import Image from "next/image";
 import { useState } from "react";
+import { useParams } from 'next/navigation';
 
 import { CustomButton } from "@/components/ui/customButton";
 import { CustomInput } from "@/components/ui/input";
-import Navbar from "@/components/navbar";
 import EmptyStateTable from "@/components/EmptyStateTable";
-import Pagination from "@/components/Pagination";
 import "@/app/globals.css";
 
 import {
   Plus,
-  ChevronDown,
   Pencil,
   Search,
   Download
 } from 'lucide-react';
 import Dropdown from "@/components/ui/dropdown";
+import Link from "next/link";
 
 export default function ReturnReconciliationPage() {
 
-    const [outletFilter, setOutletFilter] = useState('');
+    const params = useParams();
+    const outletId = params?.id;
 
-    const outletFilterOptions = [
-    { label: 'Filters', value: 'Filters' },
-    { label: 'Open', value: 'Open' },
-    { label: 'Closed', value: 'Closed' },
-  ];
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -45,14 +39,16 @@ export default function ReturnReconciliationPage() {
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
+                        <Link href={`/form/outlet/R/add-return-reconciliation/${outletId}`}>
                             <CustomButton
                             variant="primary"
                             size="lg"
                             iconPlacement="right"
                             Icon={Plus}
                             >
-                            Add List    
+                            Add Reconciliation    
                             </CustomButton>
+                        </Link>
                         </div> 
                     </div>
                     {/* Line */}
@@ -64,14 +60,6 @@ export default function ReturnReconciliationPage() {
                             iconLeft={<Search />}
                         />
 
-                        {/* Dropdown */}
-                        <Dropdown
-                            className="w-64"
-                            placeholder="Filters"
-                            options={outletFilterOptions}
-                            value={outletFilter}
-                            onChange={setOutletFilter}
-                            />
                     </div>
                     <div className="w-full flex flex-col gap-2">
                         {/* Table */}

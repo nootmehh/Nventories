@@ -17,12 +17,12 @@ interface Product {
 
 interface ProductModalProps {
   isOpen: boolean;
-  onClose: () => void;
-  onSave: (products: Product[]) => void;
+  onCloseAction: () => void;
+  onSaveAction: (products: Product[]) => void;
   outletId: string;
 }
 
-export default function ProductModal({ isOpen, onClose, onSave, outletId }: ProductModalProps) {
+export default function ProductModal({ isOpen, onCloseAction, onSaveAction, outletId }: ProductModalProps) {
   const [rawMaterials, setRawMaterials] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,10 +40,10 @@ export default function ProductModal({ isOpen, onClose, onSave, outletId }: Prod
 
       if (response.ok) {
         setRawMaterials(result.data.map((item: any) => ({
-      ...item,
-      price_per_unit: Number(item.price_per_unit) // pastikan number
-    }))
-  );
+          ...item,
+          price_per_unit: Number(item.price_per_unit), // ensure number
+          remaining_stock: item.remaining_stock != null ? Number(item.remaining_stock) : 0,
+        })));
       } else {
         setRawMaterials([]);
       }
@@ -72,8 +72,8 @@ export default function ProductModal({ isOpen, onClose, onSave, outletId }: Prod
   };
 
   const handleSave = () => {
-    onSave(selectedProducts);
-    onClose();
+  onSaveAction(selectedProducts);
+  onCloseAction();
   };
 
   const formatPrice = (price: number) => {
@@ -88,15 +88,15 @@ export default function ProductModal({ isOpen, onClose, onSave, outletId }: Prod
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl relative">
+    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-4xl relative">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-primary-blue">Pilih Produk</h2>
-          <CustomButton variant="ghost" size="smallIcon" onClick={onClose} Icon={X} />
+          <h2 className="text-xl font-bold text-primary-blue">Add Product</h2>
+      <CustomButton variant="ghost" size="smallIcon" onClick={onCloseAction} Icon={X} />
         </div>
 
         <div className="mb-4">
           <CustomInput
-            placeholder="Cari Stok"
+            placeholder="Search stock"
             className="w-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -104,8 +104,8 @@ export default function ProductModal({ isOpen, onClose, onSave, outletId }: Prod
           />
         </div>
 
-        <div className="overflow-x-auto">
-          <div className="bg-white-2 px-3 py-3 self-stretch w-full border-1 border-white-3 inline-flex justif-start gap-6 text-grey-desc text-sm font-semibold uppercase items-center">
+          <div className="overflow-x-auto">
+          <div className="bg-white-2 px-3 py-3 self-stretch w-full border-1 border-white-3 inline-flex justify-start gap-6 text-grey-desc text-sm font-semibold uppercase items-center">
             <div className="w-full">SKU</div>
             <div className="w-full">Product</div>
             <div className="w-full">Unit</div>
@@ -129,7 +129,7 @@ export default function ProductModal({ isOpen, onClose, onSave, outletId }: Prod
                     <div className="w-full">{product.unit_name}</div>
                     <div className="w-full">{product.remaining_stock}</div>
                     <div className="w-full">{formatPrice(product.price_per_unit)}</div>
-                    <div className="w-70 items-center justify-b">
+                    <div className="w-70 items-center justify-center">
                       <label className="relative flex items-center justify-center w-5 h-5 rounded-sm cursor-pointer">
                         <input
                           type="checkbox"
@@ -156,8 +156,8 @@ export default function ProductModal({ isOpen, onClose, onSave, outletId }: Prod
         </div>
 
         <div className="flex justify-end mt-6 gap-3">
-          <CustomButton variant="ghost" onClick={onClose}>Cancel</CustomButton>
-          <CustomButton variant="primary" onClick={handleSave}>Save product</CustomButton>
+          <CustomButton variant="ghost" onClick={onCloseAction}>Cancel</CustomButton>
+          <CustomButton variant="primary" onClick={() => onSaveAction(selectedProducts)}>Save product</CustomButton>
         </div>
       </div>
     </div>

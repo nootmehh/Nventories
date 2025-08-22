@@ -29,12 +29,12 @@ export default function Navbar() {
             </Link>
             
             <div className="flex items-center gap-3">
-                <CustomButton
+                {/* <CustomButton
                     variant="ghost"
                     size="icon"
                     className="hidden md:flex"
                     Icon={Bell}
-                />
+                /> */}
                 <div className="flex flex-col justify-end items-end gap-0">
                     <div className="font-semibold text-base text-primary-blue">
                         {user?.name || 'Guest'}

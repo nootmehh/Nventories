@@ -140,7 +140,7 @@ export default function RawMaterialStockPage() {
                                 <div className="w-full">{item.sku}</div>
                                 <div className="w-full">{item.opening_stock}</div>
                                 <div className="w-full">{item.stock_in || 0}</div>
-                                <div className="w-full">{item.stock_out || 0}</div>
+                                <div className="w-full">{item.stock_in_production ?? (item.stock_out ?? 0)}</div>
                                 <div className="w-full">{item.remaining_stock}</div>
                                 <div className="min-w-15">{item.unit_name}</div>
                                 <div className="w-full">

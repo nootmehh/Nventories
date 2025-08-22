@@ -1,6 +1,6 @@
-'use client';
+ 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CustomButton } from "@/components/ui/customButton";
 import { CustomInput } from "@/components/ui/input";
 import EmptyStateTable from "@/components/EmptyStateTable";
@@ -8,6 +8,7 @@ import "@/app/globals.css";
 
 import {
   Plus,
+  Eye,
   Pencil,
   Search,
   Download
@@ -16,23 +17,53 @@ import Dropdown from "@/components/ui/dropdown";
 import { useUser } from "@/context/UserContext";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import FinishedGoodsModal from '@/components/modal/finishedGoodsModal';
 
 export default function ProductionStockPage() {
     
     const { user, allOutlets } = useUser();
-        const params = useParams();
-        const router = useRouter();
-        const outletId = params.id as string;
+    const params = useParams();
+    const router = useRouter();
+    const outletId = params.id as string;
 
     const [outletFilter, setOutletFilter] = useState('');
-
-    const outletFilterOptions = [
-    { label: 'Filters', value: 'Filters' },
-    { label: 'Open', value: 'Open' },
-    { label: 'Closed', value: 'Closed' },
-  ];
+    const [items, setItems] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [showFinishedModal, setShowFinishedModal] = useState(false);
 
     const currentOutlet = allOutlets?.find(outlet => String(outlet.id) === outletId);
+
+    useEffect(() => {
+      if (!outletId) return;
+      const abortController = new AbortController();
+      async function load() {
+        setLoading(true);
+        setError(null);
+        try {
+          const res = await fetch(`/api/outlets/MS/stock-production/list?outletId=${encodeURIComponent(outletId)}`, {
+            method: 'GET',
+            signal: abortController.signal,
+            headers: { 'Accept': 'application/json' }
+          });
+          if (!res.ok) {
+            const json = await res.json().catch(() => ({}));
+            throw new Error(json?.error || `Request failed: ${res.status}`);
+          }
+          const data = await res.json();
+          setItems(Array.isArray(data) ? data : []);
+        } catch (err: any) {
+          if (!abortController.signal.aborted) {
+            setError(err?.message ?? 'Failed to load data');
+            setItems([]);
+          }
+        } finally {
+          if (!abortController.signal.aborted) setLoading(false);
+        }
+      }
+      load();
+      return () => abortController.abort();
+    }, [outletId]);
 
     return (
         <div className='w-full'>
@@ -69,17 +100,17 @@ export default function ProductionStockPage() {
                             iconLeft={<Search />}
                         />
 
-                        {/* Dropdown */}
-                        <Dropdown
-                            className="w-64"
-                            placeholder="Filters"
-                            options={outletFilterOptions}
-                            value={outletFilter}
-                            onChange={setOutletFilter}
-                            />
+                        <CustomButton
+                        className="w-40"
+                        variant={'outline'}
+                        size={'md'}
+                        iconPlacement="right"
+                        Icon={Eye}
+                        onClick={() => setShowFinishedModal(true)}
+                        >Goods list</CustomButton>
                     </div>
                     <div className="w-full flex flex-col gap-2">
-                        {/* Table */}
+                        {/* Table Header */}
                         <div className="bg-white-2 px-3 py-4 self-stretch w-full outline-1 outline-white-3 inline-flex items-center justif-start text-sm font-semibold uppercase gap-6 text-grey-desc">
                             <div className="min-w-6">
                                 No.
@@ -87,36 +118,66 @@ export default function ProductionStockPage() {
                             <div className="w-full">
                                 Date
                             </div>
-                            <div className="w-full self-stretch">
+                            <div className="w-full">
                                 SKU
                             </div>
-                             <div className="w-full self-stretch">
+                             <div className="w-full">
                                 Source stock
                             </div>
-                            <div className="w-full self-stretch">
+                            <div className="w-full">
                                 Output stock
                             </div>
-                            <div className="w-full self-stretch">
-                                status
-                            </div>
-                            <div className="invisible">
-                                <CustomButton
-                                    variant="ghost"
-                                    size="icon"
-                                    className="hidden"
-                                    Icon={Pencil}
-                                />
+                            <div className="w-full">
+                                Amount produced
                             </div>
                         </div>
-                        {/* Empty State /Table */}
-                        <EmptyStateTable
+
+                        {/* Table Body / Empty State */}
+                        {loading ? (
+                          <div className="p-6 text-center text-sm text-grey-desc font-medium">Loading...</div>
+                        ) : error ? (
+                          <div className="p-6 text-center text-sm text-red-600">{error}</div>
+                        ) : items.length === 0 ? (
+                          <EmptyStateTable
                             title="Table is empty"
                             orangeDesc="Add production stock"
                             description="to add production stock list."
-                            />
+                          />
+                        ) : (
+                          <div className="w-full flex flex-col divide-y">
+                            {items.map((it, idx) => {
+                                const date = it.production_date ? new Date(it.production_date).toLocaleDateString() : '-';
+                                // Normalize raw materials into a readable comma-separated string:
+                                const rawMaterialsList = Array.isArray(it.raw_materials)
+                                  ? it.raw_materials.map((r: any) => String(r).trim()).filter(Boolean)
+                                  : (typeof it.raw_materials === 'string'
+                                    ? it.raw_materials.split(',').map((s: string) => s.trim()).filter(Boolean)
+                                    : []);
+                                const rawMaterials = rawMaterialsList.length
+                                  ? rawMaterialsList.join(', ')
+                                  : (it.source_stock ? String(it.source_stock) : '-');
+                                const finishedGoodName = it.product_name ?? it.sku ?? '-';
+                                const quantityBeingProduced = it.quantity_produced ?? '-';
+
+                                return (
+                                    <div key={it.id ?? idx} className="px-3 py-4 w-full border-b border-white-3 inline-flex items-center justify-start gap-6 text-grey-2 font-medium text-sm">
+                                    <div className="min-w-6">{idx + 1}</div>
+                                    <div className="w-full">{date}</div>
+                                    <div className="w-full">{it.sku ?? '-'}</div>
+                                    <div className="w-full">{rawMaterials}</div>
+                                    <div className="w-full">{finishedGoodName}</div>
+                                    <div className="w-full">{quantityBeingProduced}</div>
+                                    </div>
+                                );
+                                })}
+                          </div>
+                        )}
                     </div>
                 </div>
             </div>
+            {/* Finished Goods Modal placed as a child of the root wrapper */}
+            <FinishedGoodsModal isOpen={showFinishedModal} onCloseAction={() => setShowFinishedModal(false)} outletId={outletId} />
         </div>
     );
 }
+//
